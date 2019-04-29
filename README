@@ -1,0 +1,134 @@
+ 
+=================Bin================
+
+E4412_N.bl1.bin
+    制作SD卡时的BL1数据
+bl2.bin
+    制作SD卡时的BL2数据
+
+E4412_tzsw.bin
+    制作SD卡时的TrustZone数据
+
+mkbl2
+    把uboot.bin 变成bl2.bin 的程序
+
+u-boot.bin
+    事先编译好的uboot
+
+sd_fusing.sh
+    制作SD卡的脚本
+
+zImage
+    事先编译好的zImage
+
+
+
+=================Busybox================
+busybox-1.22.1
+    这一版的有问题，复制完_install/* 后， 需要把linuxrc删除后，在重新复制进来
+    原因分析:linuxrc只是一个链接文件，删除再复制进来就是不是链接文件了,
+    可是1.17.2版本linuxrc也是一个链接，为什么就可以成功运行，目前原因不清楚
+
+busybox-1.17.2
+    这一版本是ok的
+
+ busybox-1.30.0.tar.bz2
+    busybox 1.30 版本
+
+ busybox_1.30_patch
+    1.30 版本对应的patch 
+
+
+=================Kernel================
+
+linux-3.5-20151029.tgz
+    友善之臂提供的kernel
+
+    编译步骤
+     1 cp tiny4412_linux_defconfig   .config
+     2 vim  .config, 确保  485 # CONFIG_ARM_TRUSTZONE is not set  已经注释掉
+     3 make
+
+=================Pdf================
+Android_Exynos4412_iROM_Secure_Booting_Guide_Ver.1.00.01.pdf
+    Booting 分区的说明
+
+DDI0406C_d_armv7ar_arm.pdf
+    armv7 架构手册
+
+Exynos 4412 SCP_Users Manual_Ver.0.10.00_Preliminary0.pdf
+    4412用户手册
+
+Tiny4412-1412-Schematic.pdf
+    4412 核心板原理图
+
+Tiny4412SDK-1506-Schematic.pdf
+    4412 底板原理图
+
+=================Shell================
+
+create_file_system.sh  
+    基本busybox-1.30 制作的文件系统
+=================SourceCode================
+reg_editor
+    查看寄存器的小工具
+    
+    使用方法：
+        1) 加载驱动 reg_editor_drv.ko
+        2) 执行测试程序  ./reg_editor/drv_test/drv_test
+            Use:./drv_test <r8|r16|r32> <reg_address> [num] 
+            Use:./drv_test <w8|w16|w32> <reg_address> <val>
+
+platform_resource
+    平台的资源
+
+001_led
+    001_simple_led  
+        最简单的led 驱动，insmod 点亮led1, rmmod 熄灭led1
+
+    002_plat_led
+        使用平台总写的led 驱动
+
+        测试方法:
+            1) 加载资源 insmod platform_resource/platform_res.ko
+            2) 加载驱动 indmod led_platform_drv.ko
+            3) 执行测试程序 ./002_plat_led/drv_test/drv_test ,可以看到led1~led4依次闪烁一遍
+=================TAR================
+
+filesystem.tar.gz
+    制作好的文件系统
+=================Tool================
+arm-linux-gcc-4.5.1-v6-vfp-20120301.tgz
+	交叉编译器
+
+dnw-linux.tar.gz  
+    通用dnw 工具
+
+dnw-linux_ubuntu_16_04.tar.gz
+    ubuntu 16.04 使用的dnw 工具
+    使用步骤
+        1, 解压 tar -xvf dnw-linux_ubuntu_16_04.tar.gz
+
+        2,
+            1)cd dnw-linux_ubuntu_16_04/src/driver 然后执行make
+            2)插入模块 insmod secbulk.ko
+            3)查看是否插入成功  lsmod | grep secbulk
+
+        3,
+            1)cd dnw-linux_ubuntu_16_04/src/dnw 然后执行make
+            2)sudo cp dnw /bin
+
+=================Uboot================
+uboot_tiny4412-master.zip
+    友善之臂提供的uboot-2010.12,包含了制作sd卡的工具
+
+    uboot写入SD卡的步骤
+        1 cd uboot_tiny4412-master
+        2 make tiny4412_config
+        3 make
+        4 cd uboot_tiny4412-master/sd_fuse
+        5 make
+        6 cd uboot_tiny4412-master/sd_fuse/tiny4412
+        7 sudo ./sd_fusing.sh  /dev/mmcblk0 
+
+
