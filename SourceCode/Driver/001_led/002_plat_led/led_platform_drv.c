@@ -11,6 +11,7 @@
 #include <linux/types.h>
 #include <linux/cdev.h>
 #include <linux/slab.h>
+#include <linux/atomic.h>
 
 #include "my_error.h"
 #include "my_s3c4412.h"
@@ -25,6 +26,7 @@ struct led_dev {
     int major;
     struct cdev cdev;
     struct device *device;
+    atomic_t atomic;
 };
 
 static struct class *led_class = NULL;
@@ -37,11 +39,25 @@ static int s3c4412_led_open(struct inode *inode, struct file *file)
 
     file->private_data = led_dev;
 
-    return 0;
+    if (atomic_dec_and_test(&led_dev->atomic))
+    {
+        return 0;
+    }
+    else
+    {
+        atomic_inc(&led_dev->atomic);
+        return -EBUSY;
+    }
 }
 
 static int s3c4412_led_release(struct inode *inode, struct file *file)
 {
+    struct led_dev *led_dev = file->private_data;
+
+    //trun off
+    led_dev->gpio->dat |= (0x1 << led_dev->pin);
+
+    atomic_inc(&led_dev->atomic);
 
     return 0;
 }
@@ -164,6 +180,8 @@ static int s3c4412_led_probe(struct platform_device *pdev)
 
     // turn ff led
     led_dev->gpio->dat |= (0x1 << pin);
+
+    atomic_set(&led_dev->atomic, 1);
 
     PRINT_INFO("%s probe \n", res->name);
 
