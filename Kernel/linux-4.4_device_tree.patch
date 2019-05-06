@@ -21,7 +21,7 @@ diff -uprN linux-4.4/arch/arm/boot/dts/exynos4412-tiny4412.dts linux-4.4_change/
  &serial_0 {
 diff -uprN linux-4.4/.config linux-4.4_change/.config
 --- linux-4.4/.config	1970-01-01 08:00:00.000000000 +0800
-+++ linux-4.4_change/.config	2019-05-05 17:54:06.744335899 +0800
++++ linux-4.4_change/.config	2019-05-06 11:04:16.731154511 +0800
 @@ -0,0 +1,3818 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
@@ -904,7 +904,7 @@ diff -uprN linux-4.4/.config linux-4.4_change/.config
 +# CONFIG_BLK_DEV_NBD is not set
 +CONFIG_BLK_DEV_RAM=y
 +CONFIG_BLK_DEV_RAM_COUNT=16
-+CONFIG_BLK_DEV_RAM_SIZE=8192
++CONFIG_BLK_DEV_RAM_SIZE=16384
 +# CONFIG_CDROM_PKTCDVD is not set
 +# CONFIG_ATA_OVER_ETH is not set
 +# CONFIG_MG_DISK is not set
