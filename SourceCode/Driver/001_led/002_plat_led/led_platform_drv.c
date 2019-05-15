@@ -224,11 +224,22 @@ static int s3c4412_led_remove(struct platform_device *pdev)
     return 0;
 }
 
+
+static struct platform_device_id s3c4412_led_id_table[] = {
+    {
+        .name = "s3c4412_led",
+    },
+
+    { },
+};
+
+
 static struct platform_driver s3c4412_led_driver = {
     .probe  = s3c4412_led_probe,
     .remove = s3c4412_led_remove,
+    .id_table = s3c4412_led_id_table,
     .driver = {
-        .name = "s3c4412_led",
+        .name = "s3c4412-led",
         .owner = THIS_MODULE,
     },
 };
