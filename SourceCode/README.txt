@@ -32,6 +32,7 @@ platform_resource
         4) echo 0 > brightness ; 熄灭led 
 
     004_plat_led_class
+        使用led子系统和platform-device-driver 的方法实现对led的控制
 
         1) 加载资源 insmod platform_resource/platform_res.ko
         2) 加载驱动 insmod led_plat_class_drv.ko
