@@ -7,6 +7,8 @@
 #include <linux/platform_device.h>
 #include <asm/uaccess.h>
 #include <linux/types.h>
+#include <linux/i2c.h>
+#include "my_error.h"
 
 #define GPM4_BASE (0x11000000 + 0x02E0)
 
@@ -20,6 +22,10 @@ unsigned int led1_pin = 0;
 unsigned int led2_pin = 1;
 unsigned int led3_pin = 2;
 unsigned int led4_pin = 3;
+
+static struct i2c_adapter *i2c0_adapter = NULL;
+static struct i2c_client *i2c0_client = NULL;
+
 
 static void led_dev_release(struct device * pdev)
 {
@@ -114,9 +120,52 @@ static struct platform_device *led_devices[] = {
     &led4,
 };
 
+static struct i2c_board_info  s3c4412_i2c0_dev = {
+     I2C_BOARD_INFO("24aa025e48", 0x50),
+};
+
+
+static int s3c4412_i2c0_dev_add(void)
+{
+    int ret = -1;
+
+    i2c0_adapter = i2c_get_adapter(0);
+    if (!i2c0_adapter)
+    {
+        PRINT_ERR("get adapter fail \n");
+        return -ENXIO;
+    }
+
+    i2c0_client = i2c_new_device(i2c0_adapter, &s3c4412_i2c0_dev);
+    if (!i2c0_client)
+    {
+        PRINT_ERR("i2c new dev fail \n");
+        ret = ENXIO;
+        goto err_free_adpater;
+    }
+
+    return 0;
+
+err_free_adpater:
+    i2c_put_adapter(i2c0_adapter);
+
+    return ret;
+}
+
+static int s3c4412_i2c0_dev_del(void)
+{
+    i2c_unregister_device(i2c0_client);
+
+    i2c_put_adapter(i2c0_adapter);
+
+    return 0;
+}
+
 static int __init s3c4412_platform_res_init(void)
 {
     platform_add_devices(led_devices, ARRAY_SIZE(led_devices));
+
+    s3c4412_i2c0_dev_add();
 
     return 0;
 }
@@ -129,6 +178,8 @@ static void __exit s3c4412_platform_res_exit(void)
     {
         platform_device_unregister(led_devices[i]);
     }
+
+    s3c4412_i2c0_dev_del();
 }
 
 module_init(s3c4412_platform_res_init);
