@@ -13,3 +13,5 @@ Tiny4412-1412-Schematic.pdf
 Tiny4412SDK-1506-Schematic.pdf
     4412 底板原理图
 
+24AA02E48
+	IIC 芯片

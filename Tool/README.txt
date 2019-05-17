@@ -18,3 +18,5 @@ dnw-linux_ubuntu_16_04.tar.gz
             1)cd dnw-linux_ubuntu_16_04/src/dnw 然后执行make
             2)sudo cp dnw /bin
 
+arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2
+    交叉编译 4.8.3 用于支持kernel 4.x 版本以上

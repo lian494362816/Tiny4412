@@ -15,7 +15,7 @@ linux-4.4.tar.xz
             patch -p1 < ../linux-4.4_device_tree.patch
 
         2) 编译uImage
-            make exynos_defconfig (patch 中配置了.config, 可以不执行)
+            (使用patch 就不要不执行, 否则会覆盖.config)make exynos_defconfig
             make uImage LOADADDR=0x40008000 -j4
             arch/arm/boot 下生成uImage
 
