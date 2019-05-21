@@ -223,7 +223,7 @@ static  struct i2c_driver eeprom_driver = {
     },
 
     .probe = eeprom_probe,
-    .remove = eeprom_remove,
+    .remove = __devexit_p(eeprom_remove),
     .id_table = eeprom_id_table,
 };
 

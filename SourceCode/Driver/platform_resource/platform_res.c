@@ -26,6 +26,8 @@ unsigned int led4_pin = 3;
 static struct i2c_adapter *i2c0_adapter = NULL;
 static struct i2c_client *i2c0_client = NULL;
 
+static struct i2c_adapter *i2c3_adapter = NULL;
+static struct i2c_client *i2c3_client = NULL;
 
 static void led_dev_release(struct device * pdev)
 {
@@ -161,11 +163,53 @@ static int s3c4412_i2c0_dev_del(void)
     return 0;
 }
 
+static struct i2c_board_info  s3c4412_i2c3_dev = {
+     I2C_BOARD_INFO("mma7660", 0x4C),
+};
+
+
+static int s3c4412_i2c3_dev_add(void)
+{
+    int ret = -1;
+
+    i2c3_adapter = i2c_get_adapter(3);
+    if (!i2c3_adapter)
+    {
+        PRINT_ERR("get adapter fail \n");
+        return -ENXIO;
+    }
+
+    i2c3_client = i2c_new_device(i2c3_adapter, &s3c4412_i2c3_dev);
+    if (!i2c3_client)
+    {
+        PRINT_ERR("i2c new dev fail \n");
+        ret = ENXIO;
+        goto err_free_adpater;
+    }
+
+    return 0;
+
+err_free_adpater:
+    i2c_put_adapter(i2c3_adapter);
+
+    return 0;
+}
+
+static int s3c4412_i2c3_dev_del(void)
+{
+    i2c_unregister_device(i2c3_client);
+
+    i2c_put_adapter(i2c3_adapter);
+
+    return 0;
+}
+
 static int __init s3c4412_platform_res_init(void)
 {
     platform_add_devices(led_devices, ARRAY_SIZE(led_devices));
 
     s3c4412_i2c0_dev_add();
+    s3c4412_i2c3_dev_add();
 
     return 0;
 }
@@ -180,6 +224,7 @@ static void __exit s3c4412_platform_res_exit(void)
     }
 
     s3c4412_i2c0_dev_del();
+    s3c4412_i2c3_dev_del();
 }
 
 module_init(s3c4412_platform_res_init);
