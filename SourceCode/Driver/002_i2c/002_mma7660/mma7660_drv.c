@@ -350,7 +350,7 @@ static int mma7660_probe(struct i2c_client *client, const struct i2c_device_id *
         goto err_del_cdev;
     }
 
-    ret = sysfs_create_group(&client->dev.kobj, &mma7660_attr_gropu);
+    ret = sysfs_create_group(&mma7660_device->kobj, &mma7660_attr_gropu);
     if (ret)
     {
         PRINT_ERR("syfs create fail \n");
@@ -385,7 +385,7 @@ static int mma7660_remove(struct i2c_client *client)
 
     mma7660_hw_deinit(client);
 
-    sysfs_remove_group(&client->dev.kobj,  &mma7660_attr_gropu);
+    sysfs_remove_group(&mma7660_device->kobj,  &mma7660_attr_gropu);
 
     device_destroy(mma7660_class, dev);
 
