@@ -111,4 +111,9 @@ platform_resource
                 write [0x0] = 0x10 Error
                 ret   [0x0] = 0x0
 
-
+003_spi
+    使用spi 来驱动oled_0.96 模块
+    
+    编译后直接insmod ko, 就可以看到oled显示:
+        "Tiny4412"
+        "嵌入式太难了"
