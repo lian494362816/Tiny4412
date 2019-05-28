@@ -217,6 +217,8 @@ int oled_hw_deinit(struct oled_t *oled)
     msleep(200);
     oled->gpio->dat |= (0x1 << GPIO_RESET_PIN);
 
+    oled_clear(oled);
+
     return 0;
 }
 EXPORT_SYMBOL_GPL(oled_hw_deinit);

@@ -8,7 +8,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
-
 #include "../iconv.h"
 #include "../my_s3c4412.h"
 #include "../my_error.h"
