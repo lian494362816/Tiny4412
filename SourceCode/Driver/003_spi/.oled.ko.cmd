@@ -1,0 +1,1 @@
+cmd_/home/black/Tiny4412/SourceCode/Driver/003_spi/oled.ko := arm-linux-ld -EL -r  -T /home/black/Tiny4412/Kernel/linux-3.5/scripts/module-common.lds --build-id  -o /home/black/Tiny4412/SourceCode/Driver/003_spi/oled.ko /home/black/Tiny4412/SourceCode/Driver/003_spi/oled.o /home/black/Tiny4412/SourceCode/Driver/003_spi/oled.mod.o

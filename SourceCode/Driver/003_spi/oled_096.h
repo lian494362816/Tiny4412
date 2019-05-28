@@ -7,6 +7,8 @@
 #include "my_error.h"
 #include "my_s3c4412.h"
 
+#define TMP_BUFF_SIZE (1024 * 8)
+
 struct oled_t {
     struct cdev cdev;
     struct device *device;
@@ -14,8 +16,8 @@ struct oled_t {
     unsigned int major;
     struct s3c4412_gpio *gpio;
     struct spi_device *spi;
+    unsigned char *tmp_buff;
 };
-
 
 extern struct oled_t *oled_alloc(void);
 extern void oled_free(struct oled_t *oled);
@@ -29,6 +31,8 @@ extern int oled_set_pos(struct oled_t *oled, int x, int y);
 extern void oled_show_char(struct oled_t *oled, int x, int y, int chr);
 extern void oled_show_string(struct oled_t *oled, int x, int y, char *chr);
 extern void oled_show_chinese(struct oled_t *oled, int x, int y, int no);
+extern void oled_display_on(struct oled_t *oled);
+extern void oled_display_off(struct oled_t *oled);
 
 
 #endif /* OLED_096_H__ */

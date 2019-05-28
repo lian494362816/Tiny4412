@@ -30,6 +30,7 @@
 #define GPIO_DATA_CMD_PIN (5)
 #define GPIO_RESET_PIN (4)
 
+
 #define SIZE 16
 #define XLevelL		0x02
 #define XLevelH		0x10
@@ -50,14 +51,23 @@ struct oled_t *oled_alloc(void)
         return NULL;
     }
 
+    oled->tmp_buff = kmalloc(TMP_BUFF_SIZE, GFP_KERNEL);
+    if (!oled->tmp_buff)
+    {
+        PRINT_FUNC_ERR(kmalloc);
+        goto err_free_oled;
+    }
+
     oled->gpio = ioremap(GPIO_B_BASE, sizeof(struct s3c4412_gpio));
     if (NULL == oled->gpio)
     {
         PRINT_FUNC_ERR(ioremap);
-        goto err_free_oled;
+        goto err_free_buff;
     }
 
     return oled;
+err_free_buff:
+    kfree(oled->tmp_buff);
 
 err_free_oled:
     kfree(oled);
@@ -71,6 +81,7 @@ void oled_free(struct oled_t *oled)
     if (!oled)
     {
         iounmap(oled->gpio);
+        kfree(oled->tmp_buff);
         kfree(oled);
     }
 }
@@ -220,6 +231,25 @@ int oled_set_pos(struct oled_t *oled, int x, int y)
 }
 EXPORT_SYMBOL_GPL(oled_set_pos);
 
+
+//开启OLED显示
+void oled_display_on(struct oled_t *oled)
+{
+    oled_write_cmd(oled, 0X8D);  //SET DCDC命令
+    oled_write_cmd(oled, 0X14);  //DCDC ON
+    oled_write_cmd(oled, 0XAF);  //DISPLAY ON
+}
+EXPORT_SYMBOL_GPL(oled_display_on);
+
+//关闭OLED显示
+void oled_display_off(struct oled_t *oled)
+{
+    oled_write_cmd(oled, 0X8D);  //SET DCDC命令
+    oled_write_cmd(oled, 0X10);  //DCDC OFF
+    oled_write_cmd(oled, 0XAE);  //DISPLAY OFF
+}
+EXPORT_SYMBOL_GPL(oled_display_off);
+
 //在指定位置显示一个字符,包括部分字符
 //x:0~127
 //y:0~63
@@ -264,14 +294,14 @@ void oled_show_chinese(struct oled_t *oled, int x, int y, int no)
     oled_set_pos(oled, x,y);
     for(t=0;t<16;t++)
     {
-        oled_write_byte(oled, chinese_string[2*no][t]);
+        //oled_write_byte(oled, chinese_string[2*no][t]);
         adder+=1;
     }
 
     oled_set_pos(oled, x,y + 1);
     for(t=0;t<16;t++)
     {
-        oled_write_byte(oled,chinese_string[2*no+1][t]);
+        //oled_write_byte(oled,chinese_string[2*no+1][t]);
         adder+=1;
     }
 }

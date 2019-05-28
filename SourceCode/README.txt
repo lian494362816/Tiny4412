@@ -114,6 +114,10 @@ platform_resource
 003_spi
     使用spi 来驱动oled_0.96 模块
     
-    编译后直接insmod ko, 就可以看到oled显示:
-        "Tiny4412"
-        "嵌入式太难了"
+    测试方法
+    
+        1)加载ko insmod oled.ko
+        2)执行测试程序 ./drv_test
+            此时oled 会显示"嵌入式"
+
+

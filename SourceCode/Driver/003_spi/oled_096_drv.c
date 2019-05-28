@@ -17,6 +17,7 @@
 #include "my_error.h"
 #include "my_s3c4412.h"
 #include "oled_096.h"
+#include "oled_ioctl.h"
 
 
 #define OLED_MODULE_NAME "oled096"
@@ -29,31 +30,107 @@ static int oled_index = 0;
 
 static int oled_open(struct inode *inode, struct file *file)
 {
+    struct oled_t *oled = container_of(inode->i_cdev, struct oled_t, cdev);
+
+    file->private_data = oled;
+
+    oled_hw_init(oled);
+
+    //oled_show_string(oled, 0, 0, "hello");
 
     return 0;
 }
 
 static int oled_release(struct inode *inode, struct file *file)
 {
+    struct oled_t *oled = file->private_data;
+
+    oled_hw_deinit(oled);
 
     return 0;
 }
 
 ssize_t oled_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 {
+    struct oled_t *oled = file->private_data;
+    unsigned char data;
 
-    return count;
+    if (1 == count)
+    {
+        if (copy_from_user(&data, buf, sizeof(data)))
+        {
+            PRINT_FUNC_ERR(copy_from_user);
+            return -ENOMEM;
+        }
+
+        oled_write_byte(oled, data);
+        return 1;
+    }
+    else if (count <= TMP_BUFF_SIZE)
+    {
+        if (copy_from_user(oled->tmp_buff, buf, count))
+        {
+            PRINT_FUNC_ERR(copy_from_user);
+            return -ENOMEM;
+        }
+
+        oled_write_data(oled, oled->tmp_buff, count);
+
+        return count;
+    }
+    else
+    {
+        PRINT_ERR("count to large:%d, max:%d \n", count, TMP_BUFF_SIZE);
+        return -EINVAL;
+    }
+
 }
 
 ssize_t oled_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 {
 
-    return count;
+    return -1;
 }
 
 
 long oled_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
+    struct oled_t *oled = file->private_data;
+    struct oled_pos_t pos;
+    unsigned char oled_cmd = 0;
+
+    switch(cmd)
+    {
+        case OLED_ON:
+            oled_display_on(oled);
+            return 0;
+
+        case OLED_OFF:
+            oled_display_off(oled);
+            return 0;
+
+        case OLED_SET_POS:
+            if (copy_from_user(&pos, (void __user *)arg, sizeof(struct oled_pos_t)))
+            {
+                PRINT_FUNC_ERR(copy_from_user);
+                return -ENXIO;
+            }
+
+            return oled_set_pos(oled, pos.x, pos.y);
+
+        case OLED_WRITE_CMD:
+            if (copy_from_user(&oled_cmd, (void __user *)arg, sizeof(oled_cmd)))
+            {
+                PRINT_FUNC_ERR(copy_from_user);
+                return -ENXIO;
+            }
+
+            return oled_write_cmd(oled, oled_cmd);
+
+        default:
+            PRINT_ERR("not cmd find \n");
+            return -EINVAL;
+    }
 
     return 0;
 }
@@ -117,23 +194,9 @@ static int oled_probe(struct spi_device *spi)
         goto err_cdev_del;
     }
 
-    spi->dev.platform_data = oled;
     oled_index ++;
     oled->spi = spi;
-
-    oled_hw_init(oled);
-
-    //oled_show_char(oled, 0, 0, 'A');
-    //oled_show_string(oled, 0, 0, "Tiny4412");
-    oled_show_string(oled, 0, 0, "Tiny4412");
-
-    /* 嵌入式太难了 */
-    oled_show_chinese(oled, 0,4,0);
-    oled_show_chinese(oled, 18,4,1);
-    oled_show_chinese(oled, 36,4,2);
-    oled_show_chinese(oled, 54,4,3);
-    oled_show_chinese(oled, 72,4,4);
-    oled_show_chinese(oled, 90,4,5);
+    spi_set_drvdata(spi, oled);
 
     return 0;
 
@@ -151,7 +214,7 @@ err_free_oled:
 
 static int oled_remove(struct spi_device *spi)
 {
-    struct oled_t *oled = spi->dev.platform_data;
+    struct oled_t *oled = (struct oled_t *)spi_get_drvdata(spi);
 
     dev_t dev = MKDEV(oled_major, --oled_index);
 
