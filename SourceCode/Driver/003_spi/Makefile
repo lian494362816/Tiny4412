@@ -8,9 +8,10 @@ all:
 	make -C $(KERNEL_DIR) M=$(PWD) modules
 
 clean:
-	# make -C $(KERNEL_DIR) M=$(PWD) modules clean
-	# rm Module.symvers -f
-	rm *.o *.ko modules.order  Module.symvers  *.mod.c -f
+	make -C $(KERNEL_DIR) M=$(PWD) modules clean
+	rm Module.symvers -f
+
+.PHONY: modules  clean
 
 obj-m +=  oled.o
 oled-objs += oled_096.o oled_096_drv.o

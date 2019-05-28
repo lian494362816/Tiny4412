@@ -11,6 +11,7 @@ if [[ $1 = "clean" ]] ;then
 else
     make
     cp *.ko $dir_path
+    cp drv_test/lib/libiconv.a_bk  drv_test/lib/libiconv.a
     make -C  drv_test
     cp ./drv_test/drv_test $dir_path
 fi

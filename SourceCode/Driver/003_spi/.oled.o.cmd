@@ -1,1 +1,0 @@
-cmd_/home/black/Tiny4412/SourceCode/Driver/003_spi/oled.o := arm-linux-ld -EL    -r -o /home/black/Tiny4412/SourceCode/Driver/003_spi/oled.o /home/black/Tiny4412/SourceCode/Driver/003_spi/oled_096.o /home/black/Tiny4412/SourceCode/Driver/003_spi/oled_096_drv.o 
