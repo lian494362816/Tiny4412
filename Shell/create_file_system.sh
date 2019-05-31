@@ -49,11 +49,12 @@ chmod a+x rcS
 cd ${FILE_SYSTEM_DIR}/etc
 touch fstab
 
-echo "#devicd         mount-point       type         options     dump    fsck-orfer" > fstab
-echo "proc               /proc          proc         defaults    0            0" >> fstab
-echo "sysfs              /sys           sysfs        defaults    0            0" >> fstab
-echo "tmpfs              /dev           tmpfs        defaults    0            0" >> fstab
-echo "devpts            /dev/pts        devpts       defaults    0            0" >> fstab
+echo "#devicd         mount-point           type         options     dump    fsck-orfer" > fstab
+echo "proc               /proc              proc         defaults    0            0" >> fstab
+echo "sysfs              /sys               sysfs        defaults    0            0" >> fstab
+echo "tmpfs              /dev               tmpfs        defaults    0            0" >> fstab
+echo "devpts            /dev/pts            devpts       defaults    0            0" >> fstab
+echo "debugfs           /sys/kernel/debug   debugfs      defaults    0            0" >> fstab
 
 # 3.7 Create profile
 cd ${FILE_SYSTEM_DIR}/etc
