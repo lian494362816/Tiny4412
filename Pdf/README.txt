@@ -15,3 +15,16 @@ Tiny4412SDK-1506-Schematic.pdf
 
 24AA02E48
 	IIC 芯片
+	
+MMA7660FC
+	3轴加速度芯片
+	
+OLED096_SSD1306.pdf
+    oled 0.96寸模块
+
+e.MMC_4.41-KLMxGxxE4x-x001.pdf
+    eMMC模块    
+    
+eMMC_Spec.pdf
+    eMMC标准协议(5.1)
+
