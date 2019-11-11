@@ -1,16 +1,16 @@
-diff -uprN uboot_tiny4412-master/board/samsung/tiny4412/config.mk uboot_tiny4412-master_new_change/board/samsung/tiny4412/config.mk
+diff -uprN uboot_tiny4412-master/board/samsung/tiny4412/config.mk uboot_tiny4412-master_change/board/samsung/tiny4412/config.mk
 --- uboot_tiny4412-master/board/samsung/tiny4412/config.mk	2015-10-31 15:08:43.000000000 +0800
-+++ uboot_tiny4412-master_new_change/board/samsung/tiny4412/config.mk	2019-05-05 17:27:29.585991795 +0800
++++ uboot_tiny4412-master_change/board/samsung/tiny4412/config.mk	2019-11-10 22:32:19.930602789 +0800
 @@ -10,4 +10,5 @@
  #
  #
   
 -CONFIG_SYS_TEXT_BASE = 0xc3e00000
-+# CONFIG_SYS_TEXT_BASE = 0xc3e00000
-+CONFIG_SYS_TEXT_BASE = 0xc4e00000
-diff -uprN uboot_tiny4412-master/common/cmd_bootm.c uboot_tiny4412-master_new_change/common/cmd_bootm.c
++#CONFIG_SYS_TEXT_BASE = 0xc3e00000
++CONFIG_SYS_TEXT_BASE = 0x43e00000
+diff -uprN uboot_tiny4412-master/common/cmd_bootm.c uboot_tiny4412-master_change/common/cmd_bootm.c
 --- uboot_tiny4412-master/common/cmd_bootm.c	2015-10-31 15:08:43.000000000 +0800
-+++ uboot_tiny4412-master_new_change/common/cmd_bootm.c	2019-05-05 17:32:16.332848668 +0800
++++ uboot_tiny4412-master_change/common/cmd_bootm.c	2019-11-10 22:35:27.222384053 +0800
 @@ -590,6 +590,7 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag
  	ulong		load_end = 0;
  	int		ret;
@@ -33,27 +33,27 @@ diff -uprN uboot_tiny4412-master/common/cmd_bootm.c uboot_tiny4412-master_new_ch
  after_header_check:
 -	images.os.os = hdr->ih_os;
 -	images.ep = image_get_ep (&images.legacy_hdr_os_copy);
-+	/* images.os.os = hdr->ih_os; */
-+	/* images.ep = image_get_ep (&images.legacy_hdr_os_copy); */
++	//images.os.os = hdr->ih_os;
++	//images.ep = image_get_ep (&images.legacy_hdr_os_copy);
++
 +    if (iszImage)
 +    {
 +        images.os.os = hdr->ih_os;
 +        images.ep = image_get_ep (&images.legacy_hdr_os_copy);
 +    }
-+
  #endif
  
  #ifdef CONFIG_SILENT_CONSOLE
-diff -uprN uboot_tiny4412-master/include/configs/tiny4412.h uboot_tiny4412-master_new_change/include/configs/tiny4412.h
+diff -uprN uboot_tiny4412-master/include/configs/tiny4412.h uboot_tiny4412-master_change/include/configs/tiny4412.h
 --- uboot_tiny4412-master/include/configs/tiny4412.h	2015-10-31 15:08:43.000000000 +0800
-+++ uboot_tiny4412-master_new_change/include/configs/tiny4412.h	2019-05-05 17:30:35.663835941 +0800
++++ uboot_tiny4412-master_change/include/configs/tiny4412.h	2019-11-10 22:36:19.499475524 +0800
 @@ -59,6 +59,10 @@
  #define CONFIG_SECURE_ROOTFS_SIZE	0x100000
  #endif
  
-+// boot support device tree
 +#define CONFIG_OF_LIBFDT
 +#define CONFIG_SYS_BOOTMAPSZ (20 << 20)
++
 +
  //#define CONFIG_UPDATE_SOLUTION	1
  
@@ -68,16 +68,25 @@ diff -uprN uboot_tiny4412-master/include/configs/tiny4412.h uboot_tiny4412-maste
  
  #ifdef CONFIG_ENABLE_MMU
  #define CONFIG_SYS_MAPPED_RAM_BASE	0xc0000000
-diff -uprN uboot_tiny4412-master/Makefile uboot_tiny4412-master_new_change/Makefile
+diff -uprN uboot_tiny4412-master/Makefile uboot_tiny4412-master_change/Makefile
 --- uboot_tiny4412-master/Makefile	2015-10-31 15:08:43.000000000 +0800
-+++ uboot_tiny4412-master_new_change/Makefile	2019-05-05 17:30:55.712036893 +0800
++++ uboot_tiny4412-master_change/Makefile	2019-11-11 23:30:54.305043142 +0800
 @@ -160,6 +160,9 @@ ifeq ($(HOSTARCH),$(ARCH))
  CROSS_COMPILE ?=
  endif
  
-+ARCH := arm
-+CROSS_COMPILE := arm-none-linux-gnueabi-
++ARCH:=arm
++CROSS_COMPILE:=arm-linux-
 +
  # load other configuration
  include $(TOPDIR)/config.mk
  
+@@ -168,7 +171,7 @@ include $(TOPDIR)/config.mk
+ 
+ OBJS  = $(CPUDIR)/start.o
+ ifeq ($(CPU),i386)
+-OBJS += $(CPUDIR)/start16.o
++OBJS += $(CPUDIR)/start17.o
+ OBJS += $(CPUDIR)/resetvec.o
+ endif
+ ifeq ($(CPU),ppc4xx)

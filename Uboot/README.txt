@@ -8,7 +8,8 @@ uboot_tiny4412-master.zip
         4 cd uboot_tiny4412-master/sd_fuse
         5 make
         6 cd uboot_tiny4412-master/sd_fuse/tiny4412
-        7 sudo ./sd_fusing.sh  /dev/mmcblk0 
+        7 sudo dd if=/dev/zero of=/dev/mmcblk0 bs=1024 count=10240
+        8 sudo ./sd_fusing.sh  /dev/mmcblk0 
 
 uboot_kernel_4.4_device_tree.patch
     支持kernel-4.4 设备树功能的patch
