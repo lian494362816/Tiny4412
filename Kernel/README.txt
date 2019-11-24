@@ -8,7 +8,7 @@ linux-3.5-20151029.tgz
      3 make
 
 linux-4.4.tar.xz
-    支持Tiny4412 设备树的kernel (高版本的都支持了)
+    支持Tiny4412 设备树的kernel, 官方原始版本 (高版本的都支持了)
     编译方法
         1) 打patch 
             cd linux-4.4
@@ -25,3 +25,4 @@ linux-4.4.tar.xz
 
 linux-4.4_device_tree.patch
     linux-4.4 带有设备树配置的patch 
+
