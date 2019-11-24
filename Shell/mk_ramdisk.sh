@@ -2,7 +2,7 @@
 
 RAM_DISK_NAME=ramdisk
 # ramdisk size = COUNT * 1KB
-COUNT=16384
+COUNT=32768
 TMP_FILE=_tmp_file
 # 使用busybox 制作的文件系统
 ROOTFS=/home/black/Tiny4412/filesystem

@@ -26,3 +26,16 @@ linux-4.4.tar.xz
 linux-4.4_device_tree.patch
     linux-4.4 带有设备树配置的patch 
 
+linux-4.4
+    支持设备树的内核
+        1   配置 
+            cp linux_4.4_device_tree_defconfig .config
+
+        2) 编译uImage
+            make uImage LOADADDR=0x40008000 -j4
+            arch/arm/boot 下生成uImage
+
+        3) 编译dts
+            make dtbs
+            arch/arm/boot/dts/ 下生成exynos4412-tiny4412.dtb
+
