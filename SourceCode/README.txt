@@ -121,3 +121,6 @@ platform_resource
             此时oled 会显示"嵌入式"
 
 
+05_mmap_test
+    测试mmap的功能
+
