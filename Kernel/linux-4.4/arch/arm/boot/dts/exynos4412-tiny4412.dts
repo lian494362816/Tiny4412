@@ -23,7 +23,7 @@
 
 	chosen {
 		stdout-path = &serial_0;
-		bootargs = "root=/dev/ram0 rw rootfstype=ext4 console=ttySAC0,115200 ethmac=1C:6F:65:34:51:7E init=/linuxrc";
+		bootargs = "root=/dev/ram0 rw rootfstype=ext4 console=ttySAC2,115200 ethmac=1C:6F:65:34:51:7E init=/linuxrc";
 	};
 
 	memory {

@@ -154,7 +154,8 @@
 /*
  * select serial console configuration
  */
-#define CONFIG_SERIAL0			1
+// #define CONFIG_SERIAL0			1
+#define CONFIG_SERIAL2			1
 #define CONFIG_SERIAL_MULTI		1
 #undef CONFIG_LL_DEBUG				/* disable debug */
 

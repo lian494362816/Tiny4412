@@ -50,7 +50,7 @@ linux-3.5-20151029.tgz
      3 make
 
 linux-4.4.tar.xz
-    支持Tiny4412 设备树的kernel (高版本的都支持了)
+    支持Tiny4412 设备树的kernel, 官方原始版本 (高版本的都支持了)
     编译方法
         1) 打patch 
             cd linux-4.4
@@ -67,6 +67,20 @@ linux-4.4.tar.xz
 
 linux-4.4_device_tree.patch
     linux-4.4 带有设备树配置的patch 
+
+linux-4.4
+    支持设备树的内核
+        1   配置 
+            cp linux_4.4_device_tree_defconfig .config
+
+        2) 编译uImage
+            make uImage LOADADDR=0x40008000 -j4
+            arch/arm/boot 下生成uImage
+
+        3) 编译dts
+            make dtbs
+            arch/arm/boot/dts/ 下生成exynos4412-tiny4412.dtb
+
 =================Pdf================
 Android_Exynos4412_iROM_Secure_Booting_Guide_Ver.1.00.01.pdf
     Booting 分区的说明
@@ -84,7 +98,21 @@ Tiny4412SDK-1506-Schematic.pdf
     4412 底板原理图
 
 24AA02E48
-	IIC 芯片=================Shell================
+	IIC 芯片
+	
+MMA7660FC
+	3轴加速度芯片
+	
+OLED096_SSD1306.pdf
+    oled 0.96寸模块
+
+e.MMC_4.41-KLMxGxxE4x-x001.pdf
+    eMMC模块    
+    
+eMMC_Spec.pdf
+    eMMC标准协议(5.1)
+
+=================Shell================
 
 create_file_system.sh  
     基本busybox-1.30 制作的文件系统
@@ -167,12 +195,75 @@ platform_resource
             [0x0 ] 0x0   0x1   0x2   0x3   0x4   0x10  0x0   0x0
             [0x8 ] 0x0   0x0
 
+    002_mma7660
+        mma7660 三轴加速度计 使用了DEVICE_ATTR 来调试
+
+    测试方法
+        1) 加载资源 insmod platform_resource/platform_res.ko
+        2) 加载驱动 insmod mma7660_drv.ko
+        3) 执行测试程序 ./drv_test 
+        会输出X Y Z 三个轴上的数据[-31, 31]
+            [root@4412 ~]#./drv_test
+            x:  2,y:-30,z: 22
+            x:  2,y:-30,z: 21
+            x:  1,y:-30,z: 22
+            x:  1,y:-30,z: 22
+            x:  0,y:-31,z: 21
+            x:  2,y:-31,z: 22
+        
+        4) cd /sys/bus/i2c/drivers/mma7660/3-004c, 此目录下会有reg 和 xyz_axis 2个文件
+            xyz_axis: cat 这文件就可以读取XYZ三轴上的数据
+
+                [root@4412 /sys/devices/platform/s3c2440-i2c.3/i2c-3/3-004c]#cat xyz_axis 
+                1, -30,  22
+
+            reg: cat 这个文件就可以读取mma7660所有寄存器的数据
+
+                [root@4412 /sys/devices/platform/s3c2440-i2c.3/i2c-3/3-004c]#cat reg
+                REG: [0x00] = 0x02 ...... [ 0000 0010 ]
+                REG: [0x01] = 0x3f ...... [ 0011 1111 ]
+                REG: [0x02] = 0x16 ...... [ 0001 0110 ]
+                REG: [0x03] = 0x01 ...... [ 0000 0001 ]
+                REG: [0x04] = 0x01 ...... [ 0000 0001 ]
+                REG: [0x05] = 0xa0 ...... [ 1010 0000 ]
+                REG: [0x06] = 0xe7 ...... [ 1110 0111 ]
+                REG: [0x07] = 0x01 ...... [ 0000 0001 ]
+                REG: [0x08] = 0x49 ...... [ 0100 1001 ]
+                REG: [0x09] = 0x04 ...... [ 0000 0100 ]
+                REG: [0x0a] = 0x0f ...... [ 0000 1111 ] 
+
+            reg: echo <reg> <value> > reg 就可以修改寄存器的数据
+            某些寄存器的数值可能无法改动，因此会提示Error并此寄存器的数据
+
+                [root@4412 /sys/devices/platform/s3c2440-i2c.3/i2c-3/3-004c]#echo 7 0 > reg 
+                write [0x7] = 0x0 OK
+
+                [root@4412 /sys/devices/platform/s3c2440-i2c.3/i2c-3/3-004c]#echo 0 10 > reg
+                write [0x0] = 0x10 Error
+                ret   [0x0] = 0x0
+
+003_spi
+    使用spi 来驱动oled_0.96 模块
+    
+    测试方法
+    
+        1)加载ko insmod oled.ko
+        2)执行测试程序 ./drv_test
+            此时oled 会显示"嵌入式"
 
 
 =================TAR================
 
 filesystem.tar.gz
     制作好的文件系统
+
+libiconv-1.16.tar.gz
+    iconv 库， 可以将utf-8 转为 gbk
+
+    编译方法
+        1) 创建安装目录 mkdir libiconv_build
+        2) 执行配置 ./configure --prefix=/home/black/Tiny4412/TAR/libiconv_build CC=arm-linux-gcc --host=arm 
+        3) 编译 make && make install
 =================Tool================
 arm-linux-gcc-4.5.1-v6-vfp-20120301.tgz
 	交叉编译器
@@ -207,7 +298,19 @@ uboot_tiny4412-master.zip
         4 cd uboot_tiny4412-master/sd_fuse
         5 make
         6 cd uboot_tiny4412-master/sd_fuse/tiny4412
-        7 sudo ./sd_fusing.sh  /dev/mmcblk0 
+        7 sudo dd if=/dev/zero of=/dev/mmcblk0 bs=1024 count=10240
+        8 sudo ./sd_fusing.sh  /dev/mmcblk0 
 
 uboot_kernel_4.4_device_tree.patch
     支持kernel-4.4 设备树功能的patch
+
+uboot_for_kernel_4_4
+    支持4.4内核设备树配置的uboot 
+        1 ce uboot_for_kernel_4_4
+        2 make tiny4412_config
+        3 make
+        4 cd uboot_tiny4412-master/sd_fuse
+        5 make
+        6 cd uboot_tiny4412-master/sd_fuse/tiny4412
+        7 sudo dd if=/dev/zero of=/dev/mmcblk0 bs=1024 count=10240
+        8 sudo ./sd_fusing.sh  /dev/mmcblk0 
